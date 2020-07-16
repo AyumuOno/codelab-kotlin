@@ -26,6 +26,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
+import com.example.android.trackmysleepquality.SleepNightAdapter
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 import com.google.android.material.snackbar.Snackbar
@@ -55,7 +56,7 @@ class SleepTrackerFragment : Fragment() {
                 inflater, R.layout.fragment_sleep_tracker, container, false)
 
         val application = requireNotNull(this.activity).application
-
+        val adapter = SleepNightAdapter()
         // Create an instance of the ViewModel Factory.
         val dataSource = SleepDatabase.getInstance(application).sleepDatabaseDao
         val viewModelFactory = SleepTrackerViewModelFactory(dataSource, application)
@@ -68,7 +69,7 @@ class SleepTrackerFragment : Fragment() {
         // To use the View Model with data binding, you have to explicitly
         // give the binding object a reference to it.
         binding.sleepTrackerViewModel = sleepTrackerViewModel
-
+        binding.sleepList.adapter = adapter
         // Specify the current activity as the lifecycle owner of the binding.
         // This is necessary so that the binding can observe LiveData updates.
         binding.setLifecycleOwner(this)
@@ -104,6 +105,12 @@ class SleepTrackerFragment : Fragment() {
                 // Reset state to make sure we only navigate once, even if the device
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
+            }
+        })
+
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
+            it.let {
+                adapter.data = it
             }
         })
         return binding.root
