@@ -126,6 +126,10 @@ class SleepTrackerViewModel(
      * It will clear the toast request, so if the user rotates their phone it won't show a duplicate
      * toast.
      */
+
+    private val _navigateToSleepDetail = MutableLiveData<Long>()
+    val navigateToSleepDetail = _navigateToSleepDetail
+
     fun doneShowingSnackbar() {
         _showSnackbarEvent.value = null
     }
@@ -245,5 +249,13 @@ class SleepTrackerViewModel(
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    fun onSleepNightClicked(id: Long) {
+        _navigateToSleepDetail.value = id
+    }
+
+    fun onSleepDetailNavigated() {
+        _navigateToSleepDetail.value = null
     }
 }
