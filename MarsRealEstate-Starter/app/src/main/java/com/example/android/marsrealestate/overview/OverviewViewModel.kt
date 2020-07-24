@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.android.marsrealestate.network.MarsApi
+import com.example.android.marsrealestate.network.MarsApiFilter
 import com.example.android.marsrealestate.network.MarsProperty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +52,11 @@ class OverviewViewModel : ViewModel() {
   val status: LiveData<MarsApiStatus>
     get() = _status
 
+  private val _navigateToSelectedProperty = MutableLiveData<MarsProperty>()
+
+  val navigateToSelectedProperty: LiveData<MarsProperty>
+    get() = _navigateToSelectedProperty
+
   private var viewModelJob = Job()
   private val coroutineScope = CoroutineScope(
       viewModelJob + Dispatchers.Main
@@ -60,15 +66,15 @@ class OverviewViewModel : ViewModel() {
    * Call getMarsRealEstateProperties() on init so we can display status immediately.
    */
   init {
-    getMarsRealEstateProperties()
+    getMarsRealEstateProperties(MarsApiFilter.SHOW_ALL)
   }
 
   /**
    * Sets the value of the status LiveData to the Mars API status.
    */
-  private fun getMarsRealEstateProperties() {
+  private fun getMarsRealEstateProperties(filter: MarsApiFilter) {
     coroutineScope.launch {
-      var getPropertiesDeferred = MarsApi.retrofitService.getProperties()
+      var getPropertiesDeferred = MarsApi.retrofitService.getProperties(filter.value)
       try {
         _status.value = MarsApiStatus.LOADING
         var listResult = getPropertiesDeferred.await()
@@ -89,5 +95,17 @@ class OverviewViewModel : ViewModel() {
   override fun onCleared() {
     super.onCleared()
     viewModelJob.cancel()
+  }
+
+  fun updateFilter(filter: MarsApiFilter) {
+    getMarsRealEstateProperties(filter)
+  }
+
+  fun displayPropertyDetails(marsProperty: MarsProperty) {
+    _navigateToSelectedProperty.value = marsProperty
+  }
+
+  fun displayPropertyDetailsComplete() {
+    _navigateToSelectedProperty.value = null
   }
 }
