@@ -1,0 +1,4 @@
+#Mon Jul 27 17:02:19 JST 2020
+base.0=/Users/s09172/StudioProjects/kotlin-codelab/DevBytes-starter/app/build/intermediates/dex/debug/mergeDexDebug/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
